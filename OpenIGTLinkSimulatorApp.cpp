@@ -101,22 +101,22 @@ void OpenIGTLinkSimulatorApp::getPath()
 {
 
   QString path = QFileDialog::getOpenFileName(this,
-					      tr("Open File"), "/Users",
-					      tr("CSV Files (*.csv);;Text Files (*.txt)"));
+                                              tr("Open File"), "/Users",
+                                              tr("CSV Files (*.csv);;Text Files (*.txt)"));
   if(path != " ")
     {
-      QFile file(path);
-      if(!file.open(QIODevice::ReadOnly))
-	{
-	  QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
-	  return;
-	}
-      QTextStream in(&file);
-      leFilename->setText( path );
-      file.close();
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly))
+      {
+      QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
+      return;
+      }
+    QTextStream in(&file);
+    leFilename->setText( path );
+    file.close();
     }
   this->PathString = path.toUtf8().constData();
-
+  
 }
  
  
@@ -139,13 +139,13 @@ void OpenIGTLinkSimulatorApp::scannerActivateClicked()
 
   if (fScannerActive)
     {
-      //pbScannerActivate->setText("Activate");
-      //fScannerActive = false;
+    //pbScannerActivate->setText("Activate");
+    //fScannerActive = false;
     }
   else
     {
-      //pbScannerActivate->setText("Deactivate");
-      //fScannerActive = true;
+    //pbScannerActivate->setText("Deactivate");
+    //fScannerActive = true;
     }
 
 }
@@ -156,18 +156,18 @@ void OpenIGTLinkSimulatorApp::clientActivateClicked()
     
   if (fClientActive)
     {
-      fClientActive = false;
-      if (oigtlConnector.IsNotNull())
-        {
-	  std::cerr << "Deactivating OpenIGTLink connector with:" << std::endl;
-	  std::cerr << "    Port: " << igtlPort.toInt() << std::endl;
-	  oigtlConnector->Deactivate();
-        }
-      
-      rbTrackingFile->setEnabled(true);
-      rbTrackingRandom->setEnabled(true);
-      if (rbTrackingFile->isChecked())
-	pbFilename->setEnabled(true);
+    fClientActive = false;
+    if (oigtlConnector.IsNotNull())
+      {
+      std::cerr << "Deactivating OpenIGTLink connector with:" << std::endl;
+      std::cerr << "    Port: " << igtlPort.toInt() << std::endl;
+      oigtlConnector->Deactivate();
+      }
+    
+    rbTrackingFile->setEnabled(true);
+    rbTrackingRandom->setEnabled(true);
+    if (rbTrackingFile->isChecked())
+      pbFilename->setEnabled(true);
     }
   
   else if(!fClientActive && !rbTrackingFile->isChecked() && !rbTrackingRandom->isChecked())
@@ -177,44 +177,44 @@ void OpenIGTLinkSimulatorApp::clientActivateClicked()
   
   else
     {
-      fClientActive = true;
-      
+    fClientActive = true;
+    
+    if (oigtlConnector.IsNotNull())
+      {
+      std::cerr << "Activating OpenIGTLink connector with:" << std::endl;
+      std::cerr << "    Port: " << igtlPort.toInt() << std::endl;
+      oigtlConnector->SetPort(igtlPort.toInt());
+      oigtlConnector->Activate();
+      }
+    else
+      { 
+      oigtlConnector = igtl::TCPConnectorServerOIGTL::New();
+      oigtlConnector->SetPort(18944);
       if (oigtlConnector.IsNotNull())
         {
-	  std::cerr << "Activating OpenIGTLink connector with:" << std::endl;
-	  std::cerr << "    Port: " << igtlPort.toInt() << std::endl;
-	  oigtlConnector->SetPort(igtlPort.toInt());
-	  oigtlConnector->Activate();
+        std::cerr << "Activating OpenIGTLink connector with:" << std::endl;
+        std::cerr << "    Port: " << igtlPort.toInt() << std::endl;
+        oigtlConnector->SetPort(igtlPort.toInt());
+        oigtlConnector->Activate();
         }
-      else
-	{ 
-	  oigtlConnector = igtl::TCPConnectorServerOIGTL::New();
-	  oigtlConnector->SetPort(18944);
-	  if (oigtlConnector.IsNotNull())
-	    {
-	      std::cerr << "Activating OpenIGTLink connector with:" << std::endl;
-	      std::cerr << "    Port: " << igtlPort.toInt() << std::endl;
-	      oigtlConnector->SetPort(igtlPort.toInt());
-	      oigtlConnector->Activate();
-	    }
-	}
-      
-      rbTrackingFile->setEnabled(false);
-      rbTrackingRandom->setEnabled(false);
-      pbFilename->setEnabled(false);
-      
-      if (rbTrackingFile->isChecked())
-	{
-	  this->TrackingDataReader->SetConnector(oigtlConnector);
-	  this->TrackingDataReader->SetFileName(this->PathString);
-	  this->TrackingDataReader->Start();
-	}
-      else
-	{
-	  this->TrackingDataGenerator->SetConnector(oigtlConnector);
-	  this->TrackingDataGenerator->Start();
-	}
-      
+      }
+    
+    rbTrackingFile->setEnabled(false);
+    rbTrackingRandom->setEnabled(false);
+    pbFilename->setEnabled(false);
+    
+    if (rbTrackingFile->isChecked())
+      {
+      this->TrackingDataReader->SetConnector(oigtlConnector);
+      this->TrackingDataReader->SetFileName(this->PathString);
+      this->TrackingDataReader->Start();
+      }
+    else
+      {
+      this->TrackingDataGenerator->SetConnector(oigtlConnector);
+      this->TrackingDataGenerator->Start();
+      }
+    
     }
   
 }
@@ -243,12 +243,12 @@ void OpenIGTLinkSimulatorApp::changeStatusTextColor(QLineEdit* le, int status)
 {
   if (status < igtl::TCPConnectorBase::STATUS_NUM && status >= 0)
     {
-      QPalette p = le->palette();
-      p.setColor( le->backgroundRole(),
-		  QColor(StatusColorTable[status][0],
-			 StatusColorTable[status][1],
-			 StatusColorTable[status][2]) );
-      le->setPalette(p);
+    QPalette p = le->palette();
+    p.setColor( le->backgroundRole(),
+                QColor(StatusColorTable[status][0],
+                       StatusColorTable[status][1],
+                       StatusColorTable[status][2]) );
+    le->setPalette(p);
     }
 }
 
@@ -256,12 +256,12 @@ void OpenIGTLinkSimulatorApp::changeDataIOTextColor(QLineEdit* le, int status)
 {
   if (status < 3 && status >= 0)
     {
-      QPalette p = le->palette();
-      p.setColor( le->backgroundRole(),
-		  QColor(DataIOColorTable[status][0],
-			 DataIOColorTable[status][1],
-			 DataIOColorTable[status][2]) );
-      le->setPalette(p);
+    QPalette p = le->palette();
+    p.setColor( le->backgroundRole(),
+                QColor(DataIOColorTable[status][0],
+                       DataIOColorTable[status][1],
+                       DataIOColorTable[status][2]) );
+    le->setPalette(p);
     }
 }
 
@@ -270,18 +270,18 @@ void OpenIGTLinkSimulatorApp::updateStatus()
   bool editClientFlag = true;
   if (oigtlConnector.IsNotNull())
     {
-      leStatusClient->setText(oigtlConnector->GetStatusString());
-      changeStatusTextColor(leStatusClient, oigtlConnector->GetStatus());
-      leOpenIGTLinkPort->setEnabled(oigtlConnector->GetStatus() == igtl::TCPConnectorBase::STATUS_STOP);
-      editClientFlag &= oigtlConnector->GetStatus() == igtl::TCPConnectorBase::STATUS_STOP;
-      if (oigtlConnector->GetStatus() == igtl::TCPConnectorBase::STATUS_STOP)
-	{
-	  pbClientActivate->setText("Activate");
-	}
-      else
-	{
-	  pbClientActivate->setText("Deactivate");
-	}
+    leStatusClient->setText(oigtlConnector->GetStatusString());
+    changeStatusTextColor(leStatusClient, oigtlConnector->GetStatus());
+    leOpenIGTLinkPort->setEnabled(oigtlConnector->GetStatus() == igtl::TCPConnectorBase::STATUS_STOP);
+    editClientFlag &= oigtlConnector->GetStatus() == igtl::TCPConnectorBase::STATUS_STOP;
+    if (oigtlConnector->GetStatus() == igtl::TCPConnectorBase::STATUS_STOP)
+      {
+      pbClientActivate->setText("Activate");
+      }
+    else
+      {
+      pbClientActivate->setText("Deactivate");
+      }
     }
   else{ pbAbout->setEnabled(false);}
   //bool editScannerFlag = true;

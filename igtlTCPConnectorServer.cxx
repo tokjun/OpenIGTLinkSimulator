@@ -9,7 +9,7 @@
   the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
   PURPOSE.  See the above copyright notices for more information.
 
-  =========================================================================*/
+=========================================================================*/
 
 #include "igtlSocket.h"
 
@@ -20,78 +20,78 @@
 namespace igtl
 {
 
-  //-----------------------------------------------------------------------------
-  TCPConnectorServer::TCPConnectorServer()
-  {
-    this->ServerSocket = igtl::ServerSocket::New();
-    this->ServerSocket->DebugOff();
-  }
+//-----------------------------------------------------------------------------
+TCPConnectorServer::TCPConnectorServer()
+{
+  this->ServerSocket = igtl::ServerSocket::New();
+  this->ServerSocket->DebugOff();
+}
 
-  //-----------------------------------------------------------------------------
-  TCPConnectorServer::~TCPConnectorServer()
-  {
-  }
-
-
-  //-----------------------------------------------------------------------------
-  void TCPConnectorServer::PrintSelf(std::ostream& os) const
-  {
-    this->Superclass::PrintSelf(os);
-  }
+//-----------------------------------------------------------------------------
+TCPConnectorServer::~TCPConnectorServer()
+{
+}
 
 
-  //-----------------------------------------------------------------------------
-  int TCPConnectorServer::Initialize()
-  {
-    if (this->ServerSocket->CreateServer(this->Port))
-      {
-	return 0;
-      }
+//-----------------------------------------------------------------------------
+void TCPConnectorServer::PrintSelf(std::ostream& os) const
+{
+  this->Superclass::PrintSelf(os);
+}
+
+
+//-----------------------------------------------------------------------------
+int TCPConnectorServer::Initialize()
+{
+  if (this->ServerSocket->CreateServer(this->Port))
+    {
+    return 0;
+    }
+  return 1;
+}
+
+
+//-----------------------------------------------------------------------------
+int TCPConnectorServer::WaitForConnection()
+{
+  this->Socket = NULL;
+  if (this->ServerSocket.IsNotNull())
+    {
+    this->Socket = this->ServerSocket->WaitForConnection(1000);
+    }
+
+  if (this->Socket.IsNotNull() && this->Socket->GetConnected()) // if client connected
+    {
+    this->Socket->DebugOff();
     return 1;
-  }
+    }
+
+  return 0;
+
+}
 
 
-  //-----------------------------------------------------------------------------
-  int TCPConnectorServer::WaitForConnection()
-  {
-    this->Socket = NULL;
-    if (this->ServerSocket.IsNotNull())
-      {
-	this->Socket = this->ServerSocket->WaitForConnection(1000);
-      }
+//-----------------------------------------------------------------------------
+int TCPConnectorServer::CloseConnection()
+{
+  if (this->Socket.IsNotNull())
+    {
+    this->Socket->CloseSocket();
+    }
 
-    if (this->Socket.IsNotNull() && this->Socket->GetConnected()) // if client connected
-      {
-	this->Socket->DebugOff();
-	return 1;
-      }
+  return 0;
+}
 
-    return 0;
+//-----------------------------------------------------------------------------
+int TCPConnectorServer::Finalize()
+{
+  if (this->ServerSocket.IsNotNull())
+    {
+    this->ServerSocket->CloseSocket();
+    }
 
-  }
-
-
-  //-----------------------------------------------------------------------------
-  int TCPConnectorServer::CloseConnection()
-  {
-    if (this->Socket.IsNotNull())
-      {
-	this->Socket->CloseSocket();
-      }
-
-    return 0;
-  }
-
-  //-----------------------------------------------------------------------------
-  int TCPConnectorServer::Finalize()
-  {
-    if (this->ServerSocket.IsNotNull())
-      {
-	this->ServerSocket->CloseSocket();
-      }
-
-    return 0;
-  }
+  return 0;
+}
 
 } // End of igtl namespace
 
